@@ -21,7 +21,6 @@ uint32_t hci_receive_raw(uint8_t *data, uint32_t max_len) {
     uint32_t len;
 
     ret = cyw43_bluetooth_hci_read(buf, max_len, &len);
-    printf("%i %lu\n", ret, (unsigned long) len);
     if (ret) len = 0;
 
     // Remove the padding
@@ -35,7 +34,9 @@ uint32_t hci_receive_raw(uint8_t *data, uint32_t max_len) {
 void hci_send_raw(uint8_t *data, uint32_t data_len) {
     memcpy(&buf[PRE_BUFFER_LEN], data, data_len);
     cyw43_bluetooth_hci_write(buf, data_len + PRE_BUFFER_LEN);
-    printf("Sent %lu %x %x %x %x\n", (unsigned long) data_len, data[0], data[1], data[2], data[3]);
+    printf("Sent %lu: ", (unsigned long) data_len);
+    for (int i = 0; i < data_len; i++) printf("%02x ", data[i]);
+    printf("\n");
 }
 
 
@@ -60,27 +61,26 @@ int main() {
     hci_send_raw(dat1, 4);
     sleep_ms(1000);
     len = hci_receive_raw(indat, BUF_MAX);
-    printf("%lu: ", (unsigned long) len);
-    for (int i = 0; i < len; i++) printf("%2x ", indat[i]);
+    printf("Received %lu: ", (unsigned long) len);
+    for (int i = 0; i < len; i++) printf("%02x ", indat[i]);
     printf("\n");
 
     sleep_ms(1000);
     hci_send_raw(dat2, 4);
     sleep_ms(1000);
     len = hci_receive_raw(indat, BUF_MAX);
-    printf("%lu: ", (unsigned long) len);
-    for (int i = 0; i < len; i++) printf("%2x ", indat[i]);
+    printf("Received %lu: ", (unsigned long) len);
+    for (int i = 0; i < len; i++) printf("%02x ", indat[i]);
     printf("\n");
 
     while (1) {
-        printf("Alive\n");
         sleep_ms(2000);
         cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 1);
         sleep_ms(2000);
         cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 0);
 
         len = hci_receive_raw(indat, BUF_MAX);
-        printf("%lu: ", (unsigned long) len);
+        printf("Received %lu: ", (unsigned long) len);
         for (int i = 0; i < len; i++) printf("%2x ", indat[i]);
         printf("\n");
 

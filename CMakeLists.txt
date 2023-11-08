@@ -6,14 +6,9 @@ project(my_project C CXX ASM)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 set(PICO_BOARD pico_w)
-#set(CYW43_ENABLE_BLUETOOTH 1)
-
 
 pico_sdk_init()
-
-
-
-add_executable(hci_pico main.c )
+add_executable(hci_pico hci_pico.c )
 
 target_link_libraries(hci_pico pico_stdlib pico_cyw43_arch_none pico_btstack_ble pico_btstack_cyw43)
 target_include_directories(hci_pico PRIVATE ${CMAKE_CURRENT_LIST_DIR}) # bt stack config

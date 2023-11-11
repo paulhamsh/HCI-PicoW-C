@@ -76,31 +76,28 @@ make
 
 ## Tracing cyw43_bluetooth_hci_process
 
-cyw43_bluetooth_hci_process ===>
-
-pico-sdk/src/rp2_common/pico_cyw43_driver/btstack_hci_transport_cyw43.c
-=======================================================================
-
+cyw43_bluetooth_hci_process ===> pico-sdk/src/rp2_common/pico_cyw43_driver/btstack_hci_transport_cyw43.c
+```
 // This is called from cyw43_poll_func.
 void cyw43_bluetooth_hci_process(void) {
     if (hci_transport_ready) {
         btstack_run_loop_poll_data_sources_from_irq();
     }
 }
-
-btstack_run_loop_poll_data_sources_from_irq ===>
+```
+btstack_run_loop_poll_data_sources_from_irq ===> 
 
 lib/btstack/src/btstack_run_loop.c
-==================================
-void btstack_run_loop_poll_data_sources_from_irq(void){
+```
+void **btstack_run_loop_poll_data_sources_from_irq**(void){
     btstack_assert(the_run_loop != NULL);
     btstack_assert(the_run_loop->poll_data_sources_from_irq != NULL);
     the_run_loop->poll_data_sources_from_irq();
 }
-
+```
 
 pico-sdk/src/rp2_common/pico_cyw43_driver/btstack_hci_transport_cyw43.c
-=====================================================================
+
 static void hci_transport_data_source_process(btstack_data_source_t *ds, btstack_data_source_callback_type_t callback_type) {
     assert(callback_type == DATA_SOURCE_CALLBACK_POLL);
     assert(ds == &transport_data_source);

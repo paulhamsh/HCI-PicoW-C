@@ -3,22 +3,22 @@ HCI PicoW layer in C
 
 So far links in all of btstack just to get to the HCI layer of the CYW43 driver - work in progress there!!   
 
-# Build problems
+## Build problems
 
 The driver files in pico-sdk/src/rp2_common/pico_cyw43_driver automatically pull in BTStack components, which causes link errors.
 The missing functions are:
 ```
-	btstack_cyw43_init		           src/rp2_common/pico_cyw43_arch/cyw43_arch_threadsafe_background.c
+	btstack_cyw43_init                   src/rp2_common/pico_cyw43_arch/cyw43_arch_threadsafe_background.c
 
-	btstack_cyw43_deinit		         src/rp2_common/pico_cyw43_arch/cyw43_arch_threadsafe_background.c
+	btstack_cyw43_deinit                 src/rp2_common/pico_cyw43_arch/cyw43_arch_threadsafe_background.c
 
-	cyw43_bluetooth_hci_process	     lib/cyw43-driver/src/cyw43_ctrl.c
+	cyw43_bluetooth_hci_process          lib/cyw43-driver/src/cyw43_ctrl.c
 ```
 ```btstack_cyw43_init``` and  ```btstack_cyw43_deinit``` are only needed by BTStack, so can be omitted from the code (src/rp2_common/pico_cyw43_arch/cyw43_arch_threadsafe_background).
 
 ```cyw43_bluetooth_hci_process``` is key to callbacks when data is received (and running without it seems to stop sleep_ms from working, so maybe messes up interrupts or the timer.   
 
-# CMakeList.txt
+## CMakeList.txt
 
 ```
 cmake_minimum_required(VERSION 3.13)

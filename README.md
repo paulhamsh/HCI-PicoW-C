@@ -16,6 +16,18 @@ The missing functions are:
 ```
 ```btstack_cyw43_init``` and  ```btstack_cyw43_deinit``` are only needed by BTStack, so can be omitted from the code (src/rp2_common/pico_cyw43_arch/cyw43_arch_threadsafe_background).
 
+So, edit pico-sdk/src/rp2_common/pico_cyw43_arch/cyw43_arch_threadsafe_background.c to add the #if as below on lines 49 and 62.   
+
+```
+#if CYW43_ENABLE_BLUETOOTH_BT_INIT
+    ok &= btstack_cyw43_init(context);
+#endif
+
+#if CYW43_ENABLE_BLUETOOTH_BT_INIT
+    btstack_cyw43_deinit(context);
+#endif
+```
+
 ```cyw43_bluetooth_hci_process``` is key to callbacks when data is received (and running without it seems to stop sleep_ms from working, so maybe messes up interrupts or the timer.   
 
 ## CMakeList.txt

@@ -30,6 +30,10 @@ So, edit pico-sdk/src/rp2_common/pico_cyw43_arch/cyw43_arch_threadsafe_backgroun
 
 ```cyw43_bluetooth_hci_process``` is key to callbacks when data is received (and running without it seems to stop sleep_ms from working, so maybe messes up interrupts or the timer.   
 
+
+
+
+
 ## CMakeList.txt
 
 ```
@@ -69,3 +73,58 @@ make clean
 make
 
 ```
+
+## Tracing cyw43_bluetooth_hci_process
+
+cyw43_bluetooth_hci_process ===>
+
+pico-sdk/src/rp2_common/pico_cyw43_driver/btstack_hci_transport_cyw43.c
+=======================================================================
+
+// This is called from cyw43_poll_func.
+void cyw43_bluetooth_hci_process(void) {
+    if (hci_transport_ready) {
+        btstack_run_loop_poll_data_sources_from_irq();
+    }
+}
+
+btstack_run_loop_poll_data_sources_from_irq ===>
+
+lib/btstack/src/btstack_run_loop.c
+==================================
+void btstack_run_loop_poll_data_sources_from_irq(void){
+    btstack_assert(the_run_loop != NULL);
+    btstack_assert(the_run_loop->poll_data_sources_from_irq != NULL);
+    the_run_loop->poll_data_sources_from_irq();
+}
+
+
+pico-sdk/src/rp2_common/pico_cyw43_driver/btstack_hci_transport_cyw43.c
+=====================================================================
+static void hci_transport_data_source_process(btstack_data_source_t *ds, btstack_data_source_callback_type_t callback_type) {
+    assert(callback_type == DATA_SOURCE_CALLBACK_POLL);
+    assert(ds == &transport_data_source);
+    (void)callback_type;
+    (void)ds;
+    hci_transport_cyw43_process();
+}
+
+
+hci_transport_cyw43_process ===>
+
+static void hci_transport_cyw43_process(void) {
+    CYW43_THREAD_LOCK_CHECK
+    uint32_t len = 0;
+    bool has_work;
+    do {
+        int err = cyw43_bluetooth_hci_read(hci_packet_with_pre_buffer, sizeof(hci_packet_with_pre_buffer), &len);
+        BT_DEBUG("bt in len=%lu err=%d\n", len, err);
+        if (err == 0 && len > 0) {
+            hci_transport_cyw43_packet_handler(hci_packet_with_pre_buffer[3], hci_packet_with_pre_buffer + 4, len - 4);
+            has_work = true;
+        } else {
+            has_work = false;
+        }
+    } while (has_work);
+}
+

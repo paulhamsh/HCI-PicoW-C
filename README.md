@@ -123,3 +123,44 @@ static void hci_transport_cyw43_process(void) {
     } while (has_work);
 }
 ```
+
+The trace is a little harder at this point because everything is directed via packet handlers in BTStack, but luckily we don't need to know what it does - at this point we have enough. We simply need the ```hci_transport_cyw43_process``` code in cyw43_ctrl.c   
+
+Replace this at line 231:
+
+```
+    #if CYW43_ENABLE_BLUETOOTH
+    if (self->bt_loaded && cyw43_ll_bt_has_work(&self->cyw43_ll)) {
+        cyw43_bluetooth_hci_process();
+    }
+    #endif
+```
+
+With something like this (which really needs to do a callback into your program to deliver the HCI packet received).   
+
+```
+    #if CYW43_ENABLE_BLUETOOTH_HANDLER
+    if (self->bt_loaded && cyw43_ll_bt_has_work(&self->cyw43_ll)) {
+        #define PBSIZE 500
+        uint8_t hci_packet_with_pre_buffer[PBSIZE];
+        CYW43_THREAD_LOCK_CHECK
+        uint32_t len = 0;
+        bool has_work;
+        do {
+            int err = cyw43_bluetooth_hci_read(hci_packet_with_pre_buffer, sizeof(hci_packet_with_pre_buffer), &len);
+            if (err == 0 && len > 0) {
+                printf("GOT A PACKET %lu\n", (unsigned long) len);
+                for (int i = 0; i < len; i++) printf("%02x ", hci_packet_with_pre_buffer[i]);
+                printf("\n");
+
+
+                //hci_transport_cyw43_packet_handler(hci_packet_with_pre_buffer[3], hci_packet_with_pre_buffer + 4, len - 4);
+                has_work = true;
+            } else {
+                has_work = false;
+            }
+        } while (has_work);
+    }
+    #endif
+```
+

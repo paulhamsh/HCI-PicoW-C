@@ -50,8 +50,8 @@ pico_sdk_init()
 
 add_executable(hci_pico hci_pico.c )
 add_compile_definitions(CYW43_ENABLE_BLUETOOTH=1)
-add_compile_definitions(CYW43_DISABLE_BT_INIT=1)  # this disables the btstack init and deinit functions
-add_compile_definitions(CYW43_CUSTOM_HANDLER=1)  # this uses my own handler in cyw43_ctrl.c
+add_compile_definitions(CYW43_DISABLE_BT_INIT=1)  # this disables the btstack init
+add_compile_definitions(CYW43_CUSTOM_HANDLER=1)   # this uses my own handler in cyw43_ctrl.c
 
 target_link_libraries(hci_pico pico_stdlib pico_cyw43_arch_none)
 target_include_directories(hci_pico PRIVATE ${CMAKE_CURRENT_LIST_DIR}) # bt stack config

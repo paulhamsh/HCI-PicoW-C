@@ -50,6 +50,8 @@ pico_sdk_init()
 
 add_executable(hci_pico hci_pico.c )
 add_compile_definitions(CYW43_ENABLE_BLUETOOTH=1)
+#add_compile_definitions(CYW43_ENABLE_BLUETOOTH_BT_INIT=1)  # this compiles in the btstack initi and deinit functions - I don't want that
+add_compile_definitions(CYW43_ENABLE_BLUETOOTH_HANDLER=1)  # this uses my own handler in cyw43_ctrl.c
 
 target_link_libraries(hci_pico pico_stdlib pico_cyw43_arch_none)
 target_include_directories(hci_pico PRIVATE ${CMAKE_CURRENT_LIST_DIR}) # bt stack config
@@ -139,7 +141,11 @@ Replace this at line 231:
 With something like this (which really needs to do a callback into your program to deliver the HCI packet received).   
 
 ```
-    #if CYW43_ENABLE_BLUETOOTH_HANDLER
+    #ifndef CYW43_ENABLE_BLUETOOTH_HANDLER
+    if (self->bt_loaded && cyw43_ll_bt_has_work(&self->cyw43_ll)) {
+        cyw43_bluetooth_hci_process();
+    }
+    #elif CYW43_ENABLE_BLUETOOTH_HANDLER
     if (self->bt_loaded && cyw43_ll_bt_has_work(&self->cyw43_ll)) {
         #define PBSIZE 500
         uint8_t hci_packet_with_pre_buffer[PBSIZE];

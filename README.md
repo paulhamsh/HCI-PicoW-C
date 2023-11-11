@@ -6,7 +6,8 @@ So far links in all of btstack just to get to the HCI layer of the CYW43 driver 
 ## Build problems
 
 The driver files in pico-sdk/src/rp2_common/pico_cyw43_driver automatically pull in BTStack components, which causes link errors.
-The missing functions are:
+The missing functions are:    
+
 ```
 btstack_cyw43_init                   src/rp2_common/pico_cyw43_arch/cyw43_arch_threadsafe_background.c
 btstack_cyw43_deinit                 src/rp2_common/pico_cyw43_arch/cyw43_arch_threadsafe_background.c

@@ -19,11 +19,11 @@ The missing functions are:
 So, edit pico-sdk/src/rp2_common/pico_cyw43_arch/cyw43_arch_threadsafe_background.c to add the #if as below on lines 49 and 62.   
 
 ```
-#if CYW43_ENABLE_BLUETOOTH_BT_INIT
+#ifndef CYW43_DISABLE_BT_INIT
     ok &= btstack_cyw43_init(context);
 #endif
 
-#if CYW43_ENABLE_BLUETOOTH_BT_INIT
+#ifndef CYW43_DISABLE_BT_INIT
     btstack_cyw43_deinit(context);
 #endif
 ```
@@ -50,8 +50,8 @@ pico_sdk_init()
 
 add_executable(hci_pico hci_pico.c )
 add_compile_definitions(CYW43_ENABLE_BLUETOOTH=1)
-#add_compile_definitions(CYW43_ENABLE_BLUETOOTH_BT_INIT=1)  # this compiles in the btstack initi and deinit functions - I don't want that
-add_compile_definitions(CYW43_ENABLE_BLUETOOTH_HANDLER=1)  # this uses my own handler in cyw43_ctrl.c
+add_compile_definitions(CYW43_DISABLE_BT_INIT=1)  # this disables the btstack init and deinit functions
+add_compile_definitions(CYW43_CUSTOM_HANDLER=1)  # this uses my own handler in cyw43_ctrl.c
 
 target_link_libraries(hci_pico pico_stdlib pico_cyw43_arch_none)
 target_include_directories(hci_pico PRIVATE ${CMAKE_CURRENT_LIST_DIR}) # bt stack config

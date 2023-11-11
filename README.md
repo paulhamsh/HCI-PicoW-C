@@ -8,12 +8,11 @@ So far links in all of btstack just to get to the HCI layer of the CYW43 driver 
 The driver files in pico-sdk/src/rp2_common/pico_cyw43_driver automatically pull in BTStack components, which causes link errors.
 The missing functions are:
 ```
-	btstack_cyw43_init                   src/rp2_common/pico_cyw43_arch/cyw43_arch_threadsafe_background.c
-
-	btstack_cyw43_deinit                 src/rp2_common/pico_cyw43_arch/cyw43_arch_threadsafe_background.c
-
-	cyw43_bluetooth_hci_process          lib/cyw43-driver/src/cyw43_ctrl.c
+btstack_cyw43_init                   src/rp2_common/pico_cyw43_arch/cyw43_arch_threadsafe_background.c
+btstack_cyw43_deinit                 src/rp2_common/pico_cyw43_arch/cyw43_arch_threadsafe_background.c
+cyw43_bluetooth_hci_process          lib/cyw43-driver/src/cyw43_ctrl.c
 ```
+
 ```btstack_cyw43_init``` and  ```btstack_cyw43_deinit``` are only needed by BTStack, so can be omitted from the code (src/rp2_common/pico_cyw43_arch/cyw43_arch_threadsafe_background).
 
 So, edit pico-sdk/src/rp2_common/pico_cyw43_arch/cyw43_arch_threadsafe_background.c to add the #if as below on lines 49 and 62.   

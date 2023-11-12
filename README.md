@@ -142,4 +142,7 @@ static void hci_transport_cyw43_process(void) {
 The trace is a little harder at this point because everything is directed via packet handlers in BTStack, but luckily we don't need to know what it does - at this point we have enough. We simply need the ```hci_transport_cyw43_process``` code in cyw43_ctrl.c (above) and use it to define our own ```cyw43_bluetooth_hci_process()``` in our code.   
 We don't need to check ```YW43_THREAD_LOCK_CHECK``` because the ```cyw43_poll_func``` already does that.   
 
+## Micropython
+
+To check why Micropython works, change so that ```static bool hci_transport_ready``` is just ```bool hci_transport_ready``` (in pico-sdk/src/rp2_common/pico_cyw43_driver/btstack_hci_transport_cyw43.c) then it can be accessed from Micropython code. You can then tell that it isn't set to ```true``` unless BTSTack is invoked by Micropython, so the handlers are never called and the code is fine.   
 

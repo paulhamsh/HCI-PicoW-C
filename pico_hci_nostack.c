@@ -6,14 +6,34 @@
 #include "pico/cyw43_arch.h"
 
 
+// Handler for activity on the cyw43 driver
+// Called from cyw43_ctrl.c from cyw43_poll_func()
+
+void cyw43_bluetooth_hci_process(void) {
+    #define PBSIZE 500
+    uint8_t hci_packet_with_pre_buffer[PBSIZE];
+    uint32_t len = 0;
+    bool has_work;
+    do {
+        int err = cyw43_bluetooth_hci_read(hci_packet_with_pre_buffer, sizeof(hci_packet_with_pre_buffer), &len);
+        if (err == 0 && len > 0) {
+            printf("GOT A PACKET %lu\n", (unsigned long) len);
+            for (int i = 0; i < len; i++) printf("%02x ", hci_packet_with_pre_buffer[i]);
+            printf("\n");
+
+            has_work = true;
+        } else {
+            has_work = false;
+        }
+    } while (has_work);
+}
+
 
 #define BUF_MAX 500
 uint8_t buf[BUF_MAX];
 uint32_t buf_len;
 
-
 #define PRE_BUFFER_LEN 3
-
 
 void print_data(char *pre, uint8_t *data, uint32_t len) {
     printf("%s %lu: ", pre, (unsigned long) len);

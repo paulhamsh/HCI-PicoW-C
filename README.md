@@ -28,7 +28,7 @@ So, edit pico-sdk/src/rp2_common/pico_cyw43_arch/cyw43_arch_threadsafe_backgroun
 #endif
 ```
 
-```cyw43_bluetooth_hci_process``` is key to callbacks when data is received (and running without it seems to stop sleep_ms from working, so maybe messes up interrupts or the timer.   At the bottom of the README is the trace of this function, with the upshot that some changes to cyw43_ctrl.c can replace it with our own customer handler for processing received data.    
+```cyw43_bluetooth_hci_process``` is key to callbacks when data is received (and running without it seems to stop sleep_ms from working, so maybe messes up interrupts or the timer.   At the bottom of the README is the trace of this function, with the upshot that we can just define our own function and it works ok.    
 
 
 

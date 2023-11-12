@@ -51,7 +51,6 @@ pico_sdk_init()
 add_executable(hci_pico hci_pico.c )
 add_compile_definitions(CYW43_ENABLE_BLUETOOTH=1)
 add_compile_definitions(CYW43_DISABLE_BT_INIT=1)  # when set will disable btstack init
-add_compile_definitions(CYW43_CUSTOM_HANDLER=1)   # when set will use my custom handler
 
 target_link_libraries(hci_pico pico_stdlib
                       pico_cyw43_arch_none
@@ -81,6 +80,16 @@ make
 ```
 
 ## Tracing cyw43_bluetooth_hci_process
+
+pico-sdk/lib/cyw43-driver/src/cyw43_ctrl.c (in cyw43_poll_func)
+```
+    #if CYW43_ENABLE_BLUETOOTH
+    if (self->bt_loaded && cyw43_ll_bt_has_work(&self->cyw43_ll)) {
+        cyw43_bluetooth_hci_process();
+    }
+    #endif
+```
+
 
 pico-sdk/src/rp2_common/pico_cyw43_driver/btstack_hci_transport_cyw43.c
 ```
@@ -132,15 +141,10 @@ static void hci_transport_cyw43_process(void) {
 
 The trace is a little harder at this point because everything is directed via packet handlers in BTStack, but luckily we don't need to know what it does - at this point we have enough. We simply need the ```hci_transport_cyw43_process``` code in cyw43_ctrl.c   
 
+But it turns out that we simply need to define our own function ```cyw43_bluetooth_hci_process()``` in our code.
+
 Replace this at line 231:
 
-```
-    #if CYW43_ENABLE_BLUETOOTH
-    if (self->bt_loaded && cyw43_ll_bt_has_work(&self->cyw43_ll)) {
-        cyw43_bluetooth_hci_process();
-    }
-    #endif
-```
 
 With something like this (which really needs to do a callback into your program to deliver the HCI packet received).   
 

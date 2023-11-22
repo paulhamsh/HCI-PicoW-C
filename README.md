@@ -140,7 +140,7 @@ static void hci_transport_cyw43_process(void) {
 ```
 
 The trace is a little harder at this point because everything is directed via packet handlers in BTStack, but luckily we don't need to know what it does - at this point we have enough. We simply need the ```hci_transport_cyw43_process``` code in cyw43_ctrl.c (above) and use it to define our own ```cyw43_bluetooth_hci_process()``` in our code.   
-We don't need to check ```YW43_THREAD_LOCK_CHECK``` because the ```cyw43_poll_func``` already does that.   
+We don't need to check ```CYW43_THREAD_LOCK_CHECK``` because the ```cyw43_poll_func``` already does that.   
 
 
 

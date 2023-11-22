@@ -63,7 +63,6 @@ if (USE_BTSTACK)
   add_executable(hci_pico hci_pico_btstack.c )
   target_link_libraries(hci_pico pico_stdlib pico_cyw43_arch_none
                         pico_btstack_cyw43
-                        pico_btstack_hci_transport_cyw43
                         pico_btstack_ble )
 else ()
   message("Not using btstack - hci_pico_nostack.c")

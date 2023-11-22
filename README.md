@@ -42,8 +42,8 @@ So, edit pico-sdk/src/rp2_common/pico_cyw43_arch/cyw43_arch_threadsafe_backgroun
 
 ## CMakeList.txt
 
-```
 
+```
 cmake_minimum_required(VERSION 3.13)
 
 include(./pico_sdk_import.cmake)
@@ -56,26 +56,32 @@ set(FAMILY pico_w)
 
 pico_sdk_init()
 
-add_executable(hci_pico hci_pico.c )
-
 add_compile_definitions(CYW43_ENABLE_BLUETOOTH=1)
-add_compile_definitions(CYW43_DISABLE_BT_INIT=1)   # when set will disable btstack init
 
-
-target_link_libraries(hci_pico pico_stdlib pico_cyw43_arch_none
-                      #pico_btstack_hci_transport_cyw43
-                      #pico_btstack_ble
-                      )
+if (USE_BTSTACK)
+  message("Using btstack - hci_pico_btstack.c")
+  add_executable(hci_pico hci_pico_btstack.c )
+  target_link_libraries(hci_pico pico_stdlib pico_cyw43_arch_none
+                        pico_btstack_cyw43
+                        pico_btstack_hci_transport_cyw43
+                        pico_btstack_ble )
+else ()
+  message("Not using btstack - hci_pico_nostack.c")
+  add_executable(hci_pico hci_pico_nostack.c )
+  add_compile_definitions(CYW43_DISABLE_BT_INIT=1)   # when set will disable btstack init
+  target_link_libraries(hci_pico pico_stdlib pico_cyw43_arch_none )
+endif ()
 
 target_include_directories(hci_pico PRIVATE ${CMAKE_CURRENT_LIST_DIR}) # bt stack config
 pico_enable_stdio_usb(hci_pico 1)
 pico_enable_stdio_uart(hci_pico 0)
 
 pico_add_extra_outputs(hci_pico)
-
 ```
 
 ## Build
+
+Parameter USE_BTSTACK selects whether to link in btstack and use either ```hci_pico_btstack.c``` or ```hci_pico_nostack.c```  
 
 ```
 # Set SDK path to your path
@@ -84,7 +90,11 @@ export PICO_SDK_PATH=~/pico_new/pico-sdk
 cp $PICO_SDK_PATH/external/pico_sdk_import.cmake    .
 mkdir build
 cd build
-cmake -DFAMILY=pico_w ..
+cmake -DFAMILY=pico_w -DUSE_BTSTACK=ON ..
+
+# Or...
+# cmake -DFAMILY=pico_w -DUSE_BTSTACK=OFF ..
+
 make clean
 make
 

@@ -5,7 +5,7 @@ There are two versions - one links in btstack, one does not.
 
 If btstack is linked, then it provides a function ```cyw43_bluetooth_hci_process()``` which is the callback handler for the CYW43 driver. This can, in turn, call the btstack handler.
 
-If btstack is not initialised, then ```hci_transport_ready``` is not set and the btstack handler is not called - which means the data is still there to be read by ```cyw43_bluetooth_hci_read()```.
+If btstack linked but not initialised, then ```hci_transport_ready``` is not set and the btstack handler is not called - which means the data is still there to be read by ```cyw43_bluetooth_hci_read()```.
 
 If btstack is not linked then we can provide our own ```cyw43_bluetooth_hci_process()```. This can, if we want, read the buffer using ```cyw43_bluetooth_hci_read()``` and store it in a location to be used later, or it could do nothing and leave the data to be read directly on demand.   
 

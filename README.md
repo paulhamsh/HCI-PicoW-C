@@ -74,7 +74,7 @@ pico_add_extra_outputs(hci_pico)
 
 ```
 # Set SDK path to your path
-export $PICO_SDK_PATH=~/pico_new/pico-sdk
+export PICO_SDK_PATH=~/pico_new/pico-sdk
 
 cp $PICO_SDK_PATH/external/pico_sdk_import.cmake    .
 mkdir build

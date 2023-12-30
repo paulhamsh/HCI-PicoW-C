@@ -3,7 +3,14 @@ HCI PicoW layer in C
 
 There are two versions - one links in btstack, one does not.   
 
-If btstack is linked, then it provides a function ```cyw43_bluetooth_hci_process()``` which is the callback handler for the CYW43 driver. This can, in turn, call the btstack handler.
+Both use the functions
+```
+cyw43_bluetooth_hci_read
+cyw43_bluetooth_hci_write
+```
+found in ```lib/cyw43-driver/src/cyw43_ctrl.c```
+
+If btstack is linked, then it provides a function ```cyw43_bluetooth_hci_process()``` which is the callback handler for the CYW43 driver (called from ```cyw43_ctrl.c```). This can, in turn, call the btstack handler.
 
 If btstack linked but not initialised, then ```hci_transport_ready``` is not set and the btstack handler is not called - which means the data is still there to be read by ```cyw43_bluetooth_hci_read()```.
 
